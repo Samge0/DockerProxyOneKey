@@ -100,6 +100,12 @@ touch .cache/htpasswd
 - [public-image-mirror](https://github.com/DaoCloud/public-image-mirror)
 
 
+## 相关截图
+![image](https://github.com/user-attachments/assets/a5520800-1f94-4dd1-acd2-6e4d15708e89)
+![image](https://github.com/user-attachments/assets/679cd11e-8331-4b5f-ba4d-e24cda4d684f)
+![image](https://github.com/user-attachments/assets/face75c5-74e1-4aa1-b040-d40cf21f8fae)
+
+
 ### technical exchange
 - [Join Discord >>](https://discord.com/invite/eRuSqve8CE)
 - WeChat：`SamgeApp`
