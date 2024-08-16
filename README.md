@@ -11,6 +11,15 @@
 本项目旨在简化这一过程，整合开源工具，通过一键脚本快速在自己服务器部署镜像加速服务，并利用 Caddy2 自动配置 TLS，为国内用户提供加速访问国外镜像仓库的解决方案。
 
 
+## 依赖说明
+本项目依赖`docker`以及`yq`+`docker-compose`，运行之前需要先自行安装`docker`。
+
+- debian下安装依赖（`yq`+`docker-compose`）：
+    ```shell
+    apt update && apt install docker-compose-plugin && snap install yq
+    ```
+
+
 ## 快速使用
 ```shell
 chmod +x run.sh
