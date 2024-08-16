@@ -80,6 +80,9 @@ touch .cache/htpasswd
 - 在[Cloudflare](https://dash.cloudflare.com)中添加域名，配置DNS记录，添加A记录+子域名泛解析，指向`IPv4`地址，开启CDN`Proxy`（小黄云）
 - 在Cloudflare中[创建API Token](https://dash.cloudflare.com/profile/api-tokens)，并选择`Zone: Zone: DNS: Edit DNS`权限
 - 在目标域名的`SSL/TLS`选项卡中开启HTTPS的`完全（严格）/ Full（Strict）`模式
+![image](https://github.com/user-attachments/assets/c2ac3b10-8f00-487b-ac65-34e4b15b40ba)
+![image](https://github.com/user-attachments/assets/cb27e29d-9945-4829-bc8d-7d285fc98938)
+
 
 
 ## 鸣谢
