@@ -1,8 +1,14 @@
-## DockerProxyOneKey
 
+## DockerProxyOneKey
 在魔法服务器中一键部署docker的镜像加速服务，搭配[Caddy2](https://github.com/caddyserver/caddy)+[Cloudflare](https://dash.cloudflare.com/profile/api-tokens)自动配置TLS.
 
 提供多平台镜像加速服务，支持 Docker、K8s、Quay、Ghcr、Mcr、Elastic 等多种镜像仓库。
+
+![image](https://github.com/user-attachments/assets/0fa9a776-42e6-437a-9c91-d83ed93fde2a)
+
+<p align="center" style="background-color: #f0f0f0;">
+    <img src="https://github.com/user-attachments/assets/d32957f6-94fd-4ae2-83f3-12622b7d9429" alt="DockerProxyOneKey" width="200"/>
+</p>
 
 
 ## 背景
