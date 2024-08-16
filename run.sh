@@ -381,7 +381,7 @@ for service in "${selected_service_list[@]}"; do
   reverse_proxy_value="$reverse_proxy_server:$port"
 
   # 生成 Caddyfile 条目
-  entry="${template//DOMAIN_VALUE/local$service.$domain}"
+  entry="${template//DOMAIN_VALUE/$service.$domain}"
   entry="${entry//REVERSE_PROXY_VALUE/$reverse_proxy_value}"
   entry="${entry//CLOUDFLARE_API_TOKEN/$cf_token}"
 
