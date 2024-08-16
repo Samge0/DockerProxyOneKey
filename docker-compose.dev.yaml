@@ -1,0 +1,183 @@
+services:
+
+  ## docker hub
+  hub:
+    container_name: reg-docker-hub
+    image: dqzboy/registry:latest
+    restart: always
+    environment:
+      - OTEL_TRACES_EXPORTER=none
+      - http=
+      - https=
+    volumes:
+      - ./.cache/registry:/var/lib/registry
+      - ./.cache/configs/registry-hub.yml:/etc/distribution/config.yml
+      - ./.cache/htpasswd:/auth/htpasswd
+    ports:
+      - 51000:5000
+    networks:
+      - registry-net
+
+  ## ghcr.io
+  ghcr:
+    container_name: reg-ghcr
+    image: dqzboy/registry:latest
+    restart: always
+    environment:
+      - OTEL_TRACES_EXPORTER=none
+      - http=
+      - https=
+    volumes:
+      - ./.cache/registry:/var/lib/registry
+      - ./.cache/configs/registry-ghcr.yml:/etc/distribution/config.yml
+      - ./.cache/htpasswd:/auth/htpasswd
+    ports:
+      - 52000:5000
+    networks:
+      - registry-net
+
+  ## gcr.io
+  gcr:
+    container_name: reg-gcr
+    image: dqzboy/registry:latest
+    restart: always
+    environment:
+      - OTEL_TRACES_EXPORTER=none
+      - http=
+      - https=
+    volumes:
+      - ./.cache/registry:/var/lib/registry
+      - ./.cache/configs/registry-gcr.yml:/etc/distribution/config.yml
+      - ./.cache/htpasswd:/auth/htpasswd
+    ports:
+      - 53000:5000
+    networks:
+      - registry-net
+
+  ## k8s.gcr.io
+  k8sgcr:
+    container_name: reg-k8s-gcr
+    image: dqzboy/registry:latest
+    restart: always
+    environment:
+      - OTEL_TRACES_EXPORTER=none
+      - http=
+      - https=
+    volumes:
+      - ./.cache/registry:/var/lib/registry
+      - ./.cache/configs/registry-k8sgcr.yml:/etc/distribution/config.yml
+      - ./.cache/htpasswd:/auth/htpasswd
+    ports:
+      - 54000:5000
+    networks:
+      - registry-net
+
+  ## registry.k8s.io
+  k8s:
+    container_name: reg-k8s
+    image: dqzboy/registry:latest
+    restart: always
+    environment:
+      - OTEL_TRACES_EXPORTER=none
+      - http=
+      - https=
+    volumes:
+      - ./.cache/registry:/var/lib/registry
+      - ./.cache/configs/registry-k8s.yml:/etc/distribution/config.yml
+      - ./.cache/htpasswd:/auth/htpasswd
+    ports:
+      - 55000:5000
+    networks:
+      - registry-net
+  
+  ## quay.io
+  quay:
+    container_name: reg-quay
+    image: dqzboy/registry:latest
+    restart: always
+    environment:
+      - OTEL_TRACES_EXPORTER=none
+      - http=
+      - https=
+    volumes:
+      - ./.cache/registry:/var/lib/registry
+      - ./.cache/configs/registry-quay.yml:/etc/distribution/config.yml
+      - ./.cache/htpasswd:/auth/htpasswd
+    ports:
+      - 56000:5000
+    networks:
+      - registry-net
+
+  ## mcr.microsoft.com
+  mcr:
+    container_name: reg-mcr
+    image: dqzboy/registry:latest
+    restart: always
+    environment:
+      - OTEL_TRACES_EXPORTER=none
+      - http=
+      - https=
+    volumes:
+      - ./.cache/registry:/var/lib/registry
+      - ./.cache/configs/registry-mcr.yml:/etc/distribution/config.yml
+      - ./.cache/htpasswd:/auth/htpasswd
+    ports:
+      - 57000:5000
+    networks:
+      - registry-net
+
+  ## docker.elastic.co
+  elastic:
+    container_name: reg-elastic
+    image: dqzboy/registry:latest
+    restart: always
+    environment:
+      - OTEL_TRACES_EXPORTER=none
+      - http=
+      - https=
+    volumes:
+      - ./.cache/registry:/var/lib/registry
+      - ./.cache/configs/registry-elastic.yml:/etc/distribution/config.yml
+      - ./.cache/htpasswd:/auth/htpasswd
+    ports:
+      - 58000:5000
+    networks:
+      - registry-net
+
+  ## UI
+  ui:
+    container_name: registry-ui
+    image: dqzboy/docker-registry-ui:latest
+    environment:
+      - DOCKER_REGISTRY_URL=http://reg-docker-hub:5000
+      # [必须]使用 openssl rand -hex 16 生成唯一值
+      - SECRET_KEY_BASE=9f18244a1e1179fa5aa4a06a335d01b2
+      # 启用Image TAG 的删除按钮
+      - ENABLE_DELETE_IMAGES=true
+      - NO_SSL_VERIFICATION=true
+    restart: always
+    ports:
+      - 50000:8080
+    networks:
+      - registry-net
+
+  ## caddy2
+  caddy:
+    container_name: caddy2
+    image: samge/caddy2:v2-cf
+    restart: always
+    environment:
+      - LANG=C.UTF-8
+    volumes:
+      - ./.cache/caddy2/Caddyfile:/etc/caddy/Caddyfile
+      - ./.cache/caddy2/config:/config
+      - ./.cache/caddy2/data:/data
+      - ./.cache/caddy2/logs:/logs
+    ports:
+    #   - 80:80
+      - 443:443
+    networks:
+      - registry-net
+
+networks:
+  registry-net:
