@@ -420,4 +420,4 @@ else
 fi
 
 # 使用检测到的命令执行操作
-$DOCKER_COMPOSE_CMD up -d
+$DOCKER_COMPOSE_CMD up -d $selected_services
