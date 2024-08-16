@@ -210,8 +210,7 @@ if [ -n "$custom_cofigs_dir" ] && [ -d "$custom_cofigs_dir" ]; then
     exit 1
   fi
 else
-  echo "The directory '$custom_cofigs_dir' does not exist or is not a valid directory."
-  exit 1
+  echo "Info: The directory '$custom_cofigs_dir' does not exist or is not a valid directory, ignore."
 fi
 
 # ---------------------------------------------------- 生成 docker-compose.yaml 文件 ----------------------------------------------------
