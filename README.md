@@ -6,7 +6,7 @@
 
 ![image](https://github.com/user-attachments/assets/0fa9a776-42e6-437a-9c91-d83ed93fde2a)
 
-<p align="center" style="background-color: #f0f0f0;">
+<p align="center" style="background-color: #33f0f0f0;">
     <img src="https://github.com/user-attachments/assets/d32957f6-94fd-4ae2-83f3-12622b7d9429" alt="DockerProxyOneKey" width="200"/>
 </p>
 
