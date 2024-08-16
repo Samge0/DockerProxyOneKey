@@ -29,6 +29,8 @@ show_help() {
   echo "  proxy_url                 设置 代理ip地址，默认为空值"
 
   echo "  secret_key_base           设置 registry-ui中的SECRET_KEY_BASE，默认为随机值"
+
+  echo "  base_caddyfile_path       设置 基础的Caddyfile配置文件，默认为空，如果传值，则会在基础的Caddyfile之上拼接新的配置文件"
   echo ""
   echo "示例:"
   echo "  $0 --services hub,ui --domain your_domain.com --reverse_proxy_server http://127.0.0.1 --cf_token your_cloudflare_token"
@@ -87,6 +89,9 @@ proxy_url=""
 secret_key_base=$(openssl rand -hex 16)
 # 打印生成的密钥（可选）
 echo "Generated secret_key_base: $secret_key_base"
+
+# Caddyfile 基础配置文件路径
+base_caddyfile_path="
 
 # 检查是否提供了参数
 while [[ "$#" -gt 0 ]]; do
@@ -158,6 +163,10 @@ while [[ "$#" -gt 0 ]]; do
     --secret_key_base)
       shift
       secret_key_base="$1"
+      ;;
+    --base_caddyfile_path)
+      shift
+      base_caddyfile_path="$1"
       ;;
     *)
       echo "未识别的参数：$1"
@@ -342,6 +351,12 @@ mkdir -p "$caddy_dir/logs"
 
 # 清空旧的 Caddyfile（如果存在）
 > "$caddyfile"
+
+# 如果存在基础的 Caddyfile 配置，则自动追加新配置
+if [ -f "$base_caddyfile_path" ]; then
+  cp "$base_caddyfile_path" "$caddyfile"
+  echo "" >> "$caddyfile"  # 在每个条目之间添加空行
+fi
 
 # 模板定义
 template="DOMAIN_VALUE {
