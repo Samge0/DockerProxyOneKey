@@ -91,7 +91,7 @@ secret_key_base=$(openssl rand -hex 16)
 echo "Generated secret_key_base: $secret_key_base"
 
 # Caddyfile 基础配置文件路径
-base_caddyfile_path="
+base_caddyfile_path=""
 
 # 检查是否提供了参数
 while [[ "$#" -gt 0 ]]; do
