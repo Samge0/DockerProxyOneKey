@@ -392,5 +392,17 @@ echo "Caddyfile 已生成并保存到 $caddyfile"
 # ---------------------------------------------------- 组装 Caddyfile 文件 ----------------------------------------------------
 
 
-# 使用 docker-compose 构建和启动指定的服务
-docker-compose up -d $selected_services
+# 检查 docker-compose 命令是否存在
+if command -v docker-compose &> /dev/null
+then
+    DOCKER_COMPOSE_CMD="docker-compose"
+elif command -v docker &> /dev/null && docker compose version &> /dev/null
+then
+    DOCKER_COMPOSE_CMD="docker compose"
+else
+    echo "Docker Compose is not installed."
+    exit 1
+fi
+
+# 使用检测到的命令执行操作
+$DOCKER_COMPOSE_CMD up -d
