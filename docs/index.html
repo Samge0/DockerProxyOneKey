@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DockerProxyOneKey - 一键部署Docker镜像加速服务</title>
+    <link rel="icon" type="image/png" href="icon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            400: '#d060e3',
+                            500: '#c141d8',
+                            600: '#a835b8',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Noto Sans SC"', 'Inter', 'Manrope', 'sans-serif'],
+                        serif: ['"Noto Serif SC"', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', Inter, Manrope, sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            line-height: 1.7;
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #c141d8 0%, #a835b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #c141d8 0%, #a835b8 100%);
+        }
+        
+        .icon-container {
+            background: linear-gradient(135deg, #c141d8 0%, #a835b8 100%);
+            box-shadow: 0 4px 16px rgba(193, 65, 216, 0.3);
+        }
+        
+        .section-spacing {
+            padding: 80px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .section-spacing {
+                padding: 48px 0;
+            }
+        }
+        
+        .content-width {
+            max-width: 65ch;
+            margin: 0 auto;
+        }
+        
+        .hero-title {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+        
+        .hero-subtitle {
+            font-size: clamp(1.125rem, 2vw, 1.375rem);
+            line-height: 1.6;
+        }
+        
+        .details-summary::-webkit-details-marker {
+            display: none;
+        }
+        
+        .details-summary {
+            list-style: none;
+        }
+        
+        .details-summary::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-right: 2px solid currentColor;
+            border-bottom: 2px solid currentColor;
+            transform: rotate(-45deg);
+            margin-right: 8px;
+            transition: transform 0.2s ease;
+        }
+        
+        details[open] .details-summary::before {
+            transform: rotate(45deg);
+        }
+        
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="glass fixed top-0 left-0 right-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <img src="icon.png" alt="DockerProxyOneKey" class="w-9 h-9 rounded-lg">
+                    <span class="text-xl font-semibold text-gray-900">DockerProxyOneKey</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#features" class="text-gray-700 hover:text-brand-500 transition-colors">特性</a>
+                    <a href="#how-it-works" class="text-gray-700 hover:text-brand-500 transition-colors">工作原理</a>
+                    <a href="#faq" class="text-gray-700 hover:text-brand-500 transition-colors">FAQ</a>
+                    <a href="https://github.com/yourusername/DockerProxyOneKey" target="_blank" rel="noopener noreferrer" class="text-gray-700 hover:text-brand-500 transition-colors">GitHub</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="https://github.com/yourusername/DockerProxyOneKey" target="_blank" rel="noopener noreferrer" 
+                       class="gradient-bg text-white px-6 py-2.5 rounded-lg font-medium hover:opacity-90 transition-opacity shadow-lg">
+                        快速开始
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="section-spacing pt-32">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center">
+                <div class="inline-flex items-center space-x-2 bg-white/80 backdrop-blur px-4 py-2 rounded-full mb-8 border border-gray-200">
+                    <span class="w-2 h-2 bg-brand-500 rounded-full animate-pulse"></span>
+                    <span class="text-sm text-gray-700">支持 Docker、K8s、Quay、Ghcr、Mcr、Elastic 等多种镜像仓库</span>
+                </div>
+                
+                <h1 class="hero-title text-gray-900 mb-6">
+                    一键部署 <span class="gradient-text">Docker 镜像加速服务</span>
+                </h1>
+                
+                <p class="hero-subtitle text-gray-600 mb-10 content-width">
+                    在魔法服务器中快速部署Docker镜像加速服务，搭配 Caddy2 + Cloudflare 自动配置 TLS。
+                    为国内用户提供加速访问国外镜像仓库的解决方案。
+                </p>
+                
+                <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                    <a href="https://github.com/yourusername/DockerProxyOneKey" target="_blank" rel="noopener noreferrer"
+                       class="gradient-bg text-white px-8 py-4 rounded-lg font-semibold hover:opacity-90 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 w-full sm:w-auto text-center">
+                        立即开始
+                    </a>
+                    <a href="#how-it-works" 
+                       class="glass px-8 py-4 rounded-lg font-semibold text-gray-800 hover:bg-white/95 transition-all w-full sm:w-auto text-center">
+                        了解工作原理
+                    </a>
+                </div>
+                
+                <div class="mt-16 flex justify-center">
+                    <div class="glass-card rounded-2xl p-8 max-w-2xl w-full">
+                        <div class="flex items-center space-x-2 mb-4">
+                            <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-400"></div>
+                        </div>
+                        <div class="code-block text-sm">
+                            <span class="text-gray-500">$</span> <span class="text-white">chmod</span> +x run.sh<br>
+                            <span class="text-gray-500">$</span> ./run.sh \<br>
+                            &nbsp;&nbsp;--domain your_domain.com \<br>
+                            &nbsp;&nbsp;--reverse_proxy_server http://127.0.0.1 \<br>
+                            &nbsp;&nbsp;--cf_token your_cloudflare_token
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="section-spacing bg-gradient-to-b from-white/50 to-transparent">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">核心特性</h2>
+                <p class="text-lg text-gray-600 content-width">
+                    简化 Docker 镜像加速部署流程，让容器化开发更加高效
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="glass-card rounded-xl p-6 hover:shadow-lg transition-shadow">
+                    <div class="icon-container w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">一键部署</h3>
+                    <p class="text-gray-600">单个脚本完成所有配置，无需复杂的手动设置过程，大幅降低部署门槛。</p>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="glass-card rounded-xl p-6 hover:shadow-lg transition-shadow">
+                    <div class="icon-container w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">自动 TLS 配置</h3>
+                    <p class="text-gray-600">集成 Caddy2 自动配置 HTTPS 证书，保障数据传输安全，无需手动申请证书。</p>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="glass-card rounded-xl p-6 hover:shadow-lg transition-shadow">
+                    <div class="icon-container w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">多仓库支持</h3>
+                    <p class="text-gray-600">支持 Docker Hub、K8s、Quay、Ghcr、Mcr、Elastic 等多种镜像仓库加速。</p>
+                </div>
+                
+                <!-- Feature 4 -->
+                <div class="glass-card rounded-xl p-6 hover:shadow-lg transition-shadow">
+                    <div class="icon-container w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">显著加速</h3>
+                    <p class="text-gray-600">为国内用户提供快速的镜像下载体验，大幅缩短容器镜像拉取时间。</p>
+                </div>
+                
+                <!-- Feature 5 -->
+                <div class="glass-card rounded-xl p-6 hover:shadow-lg transition-shadow">
+                    <div class="icon-container w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">灵活配置</h3>
+                    <p class="text-gray-600">支持自定义配置目录、镜像仓库选择、代理参数等，满足不同使用场景需求。</p>
+                </div>
+                
+                <!-- Feature 6 -->
+                <div class="glass-card rounded-xl p-6 hover:shadow-lg transition-shadow">
+                    <div class="icon-container w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">安全验证</h3>
+                    <p class="text-gray-600">可选配置 htpasswd 验证，保护您的镜像代理服务不被未授权访问。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="section-spacing">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">工作原理</h2>
+                <p class="text-lg text-gray-600 content-width">
+                    通过简单的三个步骤，快速搭建属于你的 Docker 镜像加速服务
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8 mb-16">
+                <div class="text-center">
+                    <div class="glass-card w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl font-bold text-brand-500">
+                        1
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">准备服务器</h3>
+                    <p class="text-gray-600">在魔法服务器上安装 Docker 和相关依赖工具</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="glass-card w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl font-bold text-brand-500">
+                        2
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">配置 Cloudflare</h3>
+                    <p class="text-gray-600">添加域名 DNS 记录，创建 API Token，配置 SSL/TLS</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="glass-card w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl font-bold text-brand-500">
+                        3
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">运行脚本</h3>
+                    <p class="text-gray-600">执行一键部署脚本，等待服务启动完成</p>
+                </div>
+            </div>
+            
+            <div class="glass-card rounded-2xl p-8 md:p-12">
+                <h3 class="text-2xl font-bold text-gray-900 mb-6">部署示例</h3>
+                
+                <div class="space-y-6">
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-800 mb-2">基础部署</h4>
+                        <div class="code-block">
+                            <span class="text-gray-500">$</span> <span class="text-white">chmod</span> +x run.sh<br>
+                            <span class="text-gray-500">$</span> ./run.sh \<br>
+                            &nbsp;&nbsp;--domain your_domain.com \<br>
+                            &nbsp;&nbsp;--reverse_proxy_server http://127.0.0.1 \<br>
+                            &nbsp;&nbsp;--cf_token your_cloudflare_token
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-800 mb-2">自定义镜像仓库</h4>
+                        <div class="code-block">
+                            <span class="text-gray-500">$</span> ./run.sh \<br>
+                            &nbsp;&nbsp;--services hub,ui,caddy \<br>
+                            &nbsp;&nbsp;--domain your_domain.com \<br>
+                            &nbsp;&nbsp;--reverse_proxy_server http://127.0.0.1 \<br>
+                            &nbsp;&nbsp;--cf_token your_cloudflare_token
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-800 mb-2">高级配置</h4>
+                        <div class="code-block">
+                            <span class="text-gray-500">$</span> ./run.sh \<br>
+                            &nbsp;&nbsp;--update_yml <span class="text-white">true</span> \<br>
+                            &nbsp;&nbsp;--proxy_ttl 168h \<br>
+                            &nbsp;&nbsp;--health_enabled <span class="text-white">true</span> \<br>
+                            &nbsp;&nbsp;--health_interval 10s \<br>
+                            &nbsp;&nbsp;--storage_upload_enabled <span class="text-white">true</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="section-spacing bg-gradient-to-b from-white/50 to-transparent">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">常见问题</h2>
+                <p class="text-lg text-gray-600">
+                    关于 DockerProxyOneKey 的常见疑问解答
+                </p>
+            </div>
+            
+            <div class="space-y-4">
+                <details class="glass-card rounded-lg overflow-hidden group">
+                    <summary class="details-summary cursor-pointer p-6 font-semibold text-gray-900 hover:bg-gray-50 transition-colors">
+                        这个项目解决了什么问题？
+                    </summary>
+                    <div class="p-6 pt-0 text-gray-600">
+                        <p>由于许多Docker镜像仓库位于国外，国内用户下载镜像时速度较慢。虽然有一些免费代理服务，但通常需要白名单审核，流程较为繁琐。本项目通过一键脚本在自己服务器上部署镜像加速服务，无需等待审核，即开即用。</p>
+                    </div>
+                </details>
+                
+                <details class="glass-card rounded-lg overflow-hidden group">
+                    <summary class="details-summary cursor-pointer p-6 font-semibold text-gray-900 hover:bg-gray-50 transition-colors">
+                        需要什么样的服务器？
+                    </summary>
+                    <div class="p-6 pt-0 text-gray-600">
+                        <p>需要一台可以访问国外Docker镜像仓库的服务器（俗称"魔法服务器"），并已安装Docker。脚本会自动处理其他依赖的安装和配置。</p>
+                    </div>
+                </details>
+                
+                <details class="glass-card rounded-lg overflow-hidden group">
+                    <summary class="details-summary cursor-pointer p-6 font-semibold text-gray-900 hover:bg-gray-50 transition-colors">
+                        如何获取 Cloudflare API Token？
+                    </summary>
+                    <div class="p-6 pt-0 text-gray-600">
+                        <p>登录 Cloudflare 后，访问 API Token 页面创建新令牌，选择 "Zone: DNS: Edit" 权限即可。同时需要在域名管理中配置DNS记录，将域名指向你的服务器IP地址。</p>
+                    </div>
+                </details>
+                
+                <details class="glass-card rounded-lg overflow-hidden group">
+                    <summary class="details-summary cursor-pointer p-6 font-semibold text-gray-900 hover:bg-gray-50 transition-colors">
+                        支持哪些 Docker 镜像仓库？
+                    </summary>
+                    <div class="p-6 pt-0 text-gray-600">
+                        <p>支持多种主流镜像仓库，包括 Docker Hub、Kubernetes (K8s)、Quay、GitHub Container Registry (Ghcr)、Microsoft Container Registry (Mcr)、Elastic 等等。</p>
+                    </div>
+                </details>
+                
+                <details class="glass-card rounded-lg overflow-hidden group">
+                    <summary class="details-summary cursor-pointer p-6 font-semibold text-gray-900 hover:bg-gray-50 transition-colors">
+                        如何配置安全验证？
+                    </summary>
+                    <div class="p-6 pt-0 text-gray-600">
+                        <p>如果需要htpasswd验证，可以创建 .cache/htpasswd 文件并配置用户密码。可以使用在线htpasswd生成器创建密码文件，脚本会自动加载验证配置。</p>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="section-spacing">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <div class="glass-card rounded-2xl p-8 md:p-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                    准备开始加速您的 Docker 体验？
+                </h2>
+                <p class="text-lg text-gray-600 mb-8">
+                    立即部署您的专属镜像加速服务，享受流畅的容器开发体验
+                </p>
+                <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                    <a href="https://github.com/yourusername/DockerProxyOneKey" target="_blank" rel="noopener noreferrer"
+                       class="gradient-bg text-white px-8 py-4 rounded-lg font-semibold hover:opacity-90 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 w-full sm:w-auto">
+                        查看 GitHub 仓库
+                    </a>
+                    <a href="#how-it-works" 
+                       class="glass px-8 py-4 rounded-lg font-semibold text-gray-800 hover:bg-white/95 transition-all w-full sm:w-auto">
+                        阅读部署文档
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="glass py-12">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="flex items-center space-x-3 mb-6 md:mb-0">
+                    <img src="icon.png" alt="DockerProxyOneKey" class="w-8 h-8 rounded-lg">
+                    <span class="text-lg font-semibold text-gray-900">DockerProxyOneKey</span>
+                </div>
+                
+                <div class="flex flex-wrap items-center justify-center gap-6">
+                    <a href="https://github.com/yourusername/DockerProxyOneKey" target="_blank" rel="noopener noreferrer" 
+                       class="text-gray-600 hover:text-brand-500 transition-colors flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>GitHub</span>
+                    </a>
+                    
+                    <a href="https://discord.gg/eRuSqve8CE" target="_blank" rel="noopener noreferrer"
+                       class="text-gray-600 hover:text-brand-500 transition-colors flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/>
+                        </svg>
+                        <span>Discord</span>
+                    </a>
+                    
+                    <div class="flex items-center space-x-2 text-gray-600">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                        <span>MIT License</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 pt-8 border-t border-gray-200 text-center text-gray-500 text-sm">
+                <p>本程序仅用于技术交流，用户的所有行为与本项目的作者无关。</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Add scroll effect to navigation
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                nav.classList.add('shadow-md');
+            } else {
+                nav.classList.remove('shadow-md');
+            }
+        });
+    </script>
+</body>
+</html>
